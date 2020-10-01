@@ -260,3 +260,7 @@ The differences from Q-Learning are:
 
 1. Q\[next_state]\[next_action] instead of max(Q\[next_state])
 2. action = next_action which is why it's called on-policy algorithm.
+
+## Reference
+
+Book: *PyTorch 1.x Reinforcement Learning*
