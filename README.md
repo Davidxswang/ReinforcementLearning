@@ -261,6 +261,49 @@ The differences from Q-Learning are:
 1. Q\[next_state]\[next_action] instead of max(Q\[next_state])
 2. action = next_action which is why it's called on-policy algorithm.
 
+## (Contextual) Multi-Armed Bandit
+
+In this model, we can take several actions, and every action corresponds to certain reward, we need to decide which action to take based on the policy. Usually it does not involve context (state) information. If we consider context (state) in Multi-Armed Bandit problem, every Multi-Armed Bandit machine has its own payout probabilities and reward, which is the "context" or "state" when talking in multi-machine context.
+
+The biggest difference from MDP is that in Multi-Armed Bandit problem, the action does not depend on the previous state, and that in Contextual (multi-machine) Multi-Armed Bandit problem, the action does not depend on the previous state either.
+
+To develop a reinforcement learning algorithm for Multi-Armed Bandit problem, we can use a policy function to obtain the action based on Q or action appearing count.
+
+### Epsilon Greedy Policy
+
+It will choose the action based on the probability:
+
+- best_action: $1 - \epsilon + \frac{\epsilon}{N_{action}}$
+- other_action: $\frac{\epsilon}{N_{action}}$
+
+### Softmax Exploration Policy
+
+It will not choose the non-best actions based on a fixed equal probabilities, instead, it will choose the action based on the softmax of the Q function.
+
+$prob = softmax(Q)$
+
+### Upper Confidence Bound
+
+As the training proceeds, the interval that the action value falls into becomes narrower. We can use the upper bound of this interval to generate the action. The algorithm is greedy.
+
+$action = \argmax(Q + \sqrt{2*\log(episode)/action\_count})$
+
+where action_count is the list recording how many times each action appears till this episode.
+
+This algorithm is different from Epsilon Greedy and Softmax Exploration in that it will change probabilities distribution over time.
+
+### Thompson Sampling Policy
+
+This algorithm will use [Beta Distribution](https://en.wikipedia.org/wiki/Beta_distribution) to generate the action.
+
+$action = \argmax{\Beta(\alpha, \beta)}$
+
+where $\alpha$ is how many times the reward appears for each action, and $\beta$ is how many times the reward does not appear for each action.
+
+### Contextual Multi-Armed Bandit Problem
+
+The difference between Contextual and Non-Contextual Multi-Armed Bandit problems is that we need to maintain the Q for each state (or machine, in the context of Multi-Armed Bandit machines).
+
 ## Reference
 
 Book: *PyTorch 1.x Reinforcement Learning*
