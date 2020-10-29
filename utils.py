@@ -2,6 +2,17 @@ import matplotlib.pyplot as plt
 import torch
 
 def draw(file_name, title, x_label, y_label, y, x=None):
+    r"""
+    Plot the figure and write it to the file
+
+    Args:
+        file_name: the file name to save
+        title: the title of the plot
+        x_label: label for x-axis
+        y_label: label for y-axis
+        y: the data to plot
+        x: the data for x coordinate
+    """
     plt.figure()
     if x is not None:
         plt.plot(x, y)
@@ -13,19 +24,27 @@ def draw(file_name, title, x_label, y_label, y, x=None):
     plt.savefig(file_name)
 
 
-def gen_epsilon_greedy_policy(n_action, epsilon):
+def gen_epsilon_greedy_policy(n_action, epsilon, estimator=None):
     """Generate a epsilon greedy policy
+
     Args:
         n_action: the number of actions
         epsilon: epsilon
+        estimator: the estimator to predict the Q, has to implement the predict method to receive a state as a parameter
     Returns:
         the policy function: 
-            inputs: state, Q
+            inputs: state, Q (=None if estimator is not None)
             output: action
     """
-    def policy_function(state, Q):
+    def policy_function(state, Q=None):
+        if estimator is None and Q is None:
+            raise Exception('estimator and Q cannot both be none in the policy function')
+        if estimator is not None:
+            Q_state = estimator.predict(state)
+        else:
+            Q_state = Q[state]
         probs = torch.ones(n_action) * epsilon / n_action
-        best_action = torch.argmax(Q[state]).item()
+        best_action = torch.argmax(Q_state).item()
         probs[best_action] += 1 - epsilon
         action = torch.multinomial(probs, 1).item()
         return action
@@ -34,6 +53,7 @@ def gen_epsilon_greedy_policy(n_action, epsilon):
 
 def gen_softmax_exploration_policy(tau):
     """Generate a softmax exploration policy
+
     Args:
         tau (float): to control the exploration and exploitation, -> 0, towards best action, -> 1, towards equal exploration
     Returns:
@@ -52,6 +72,7 @@ def gen_softmax_exploration_policy(tau):
 def upper_confidence_bound(Q, state, action_count, episode):
     """
     Return an action with the highes upper confidence bound
+
     Args:
         Q (torch.Tensor): Q-function
         state (int): the state the env is on
@@ -67,6 +88,7 @@ def upper_confidence_bound(Q, state, action_count, episode):
 def thompson_sampling(alpha, beta):
     """
     Return an action based on beta distribution
+
     Args:
         alpha: alpha in beta distribution
         beta: beta in beta distribution

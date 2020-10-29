@@ -304,6 +304,12 @@ where $\alpha$ is how many times the reward appears for each action, and $\beta$
 
 The difference between Contextual and Non-Contextual Multi-Armed Bandit problems is that we need to maintain the Q for each state (or machine, in the context of Multi-Armed Bandit machines).
 
+## Function Approximation
+
+When the number of states is countless, we cannot use a lookup table to obtain the next action, in which case, we should turn to Function Approximation.
+
+Function Approximation is a method to estimate the Q values of a state using a function (maybe linear, maybe nonlinear, e.g., Neural Network). The function can accept the a parameter, state, and return the Q values for the given state, Q, which is a vector whose length is the number of actions.
+
 ## Reference
 
 Book: *PyTorch 1.x Reinforcement Learning*
