@@ -1,8 +1,9 @@
 # Reinforcement Learning
+
 While I was reading the book *PyTorch 1.x Reinforcement Learning*, I reproduced some of the code in the book.
 
 > Requirements:
-> 
+>
 > - PyTorch
 > - Gym (OpenAI Gym)
 > - Gym[atari] environments
@@ -309,6 +310,29 @@ The difference between Contextual and Non-Contextual Multi-Armed Bandit problems
 When the number of states is countless, we cannot use a lookup table to obtain the next action, in which case, we should turn to Function Approximation.
 
 Function Approximation is a method to estimate the Q values of a state using a function (maybe linear, maybe nonlinear, e.g., Neural Network). The function can accept the a parameter, state, and return the Q values for the given state, Q, which is a vector whose length is the number of actions.
+
+## Deep Q-Networks (DQN)
+
+Using a neural network to predict Q-values for all actions on the state. The network can be a fully connected networks, or a convolutional neural networks (CNNs).
+
+### Experience Replay
+
+To improve the efficiency of learning, we can accumulate the `(state, action, reward, next_state, is_done)` in the memory. When the memory is long enough, a batch of random samples can be drawn from the memory and used for training the model.
+
+### Double Deep Q-Networks
+
+To predict the Q-values of `next_state`, we can use a separate network (called `target model`) to predict the Q-values of `next_state` and update it once per several episodes. By updating it, we mean copying the weights of the learning model to the `target model`.
+
+### Dueling Deep Q-Networks (DDQN)
+
+We can decouple the Deep Q-Networks into two parts:
+
+- `V(state)`: state-value function, calculating the value of being at the state
+- `A(state, action)`: state-dependent action advantage function, estimating how much better it is to take the action, rather than taking other actions at the state.
+
+By decoupling the value and advantage functions, we are able to accommodate the fact that our agent may not necessarily look at both the value and the advantage at the same time during the learning process. In other words, the agent using DDQNs can efficiently optimize either or both functions as it prefers.
+
+The Q-values can be calculated as such: $Q(state, action) = V(state) + A(state, action) - \frac{1}{N_{action}}\sum_a{A(state, action)}$.
 
 ## Reference
 
