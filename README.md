@@ -334,6 +334,43 @@ By decoupling the value and advantage functions, we are able to accommodate the 
 
 The Q-values can be calculated as such: $Q(state, action) = V(state) + A(state, action) - \frac{1}{N_{action}}\sum_a{A(state, action)}$.
 
+## Reinforce Algorithm
+
+### Vanilla Reinforce Algorithm
+
+It is known as Monte Carlo policy gradient. It collects trajectory samples from one episode using its current policy and uses them to the policy parameters $\theta$. The learning objective function for policy gradients is: $J(\theta) = E[\sum_{t=0}^{T-1}{reward_{t+1}}] = \sum_{t=0}^{T-1}{Policy(state_t, action_t)*reward_{t+1}}$.
+
+Its gradient is: $\bigtriangledown J(\theta) = \sum_{t=0}^{T-1}{\bigtriangledown log \pi (action_t | state_t) * return_t}$, where $return_t$ is the cumulative discounted reward until time $t$, $\pi (action_t | state_t)$ is the stochastic policy, which determines the probabilities of taking certain actions at a given state.
+
+Since a policy update is conducted after the entire episode finishes and all samples are collected, Reinforce is an off-policy algorithm.
+
+### Reinforce with Baseline
+
+Stochastic policy may take different actions at the same state in different episodes. This can confuse the training, since one sampled experience wants to increase the probability of choosing on action while another sampled experience may want to decrease it. 
+
+In Reinforce with Baseline, we subtract the baseline state-value from the return ($G_t$). As a result, an advantage function $A_t$ is used in the gradient update. By using the baseline value, we can calibrate the rewards with respect to the average action given a state.
+
+Advantage: $A_t = G_t - Value(state_t)$
+
+Gradient: $\bigtriangledown J(\theta) = \sum_{t=0}^{T-1}{\bigtriangledown log \pi (action_t | state_t) * A_t}$
+
+$Value(state_t)$ is the value function that estimates the state-value given a state $state_t$.
+
+We can either design two separate networks for policy and value, or design one network that outputs the policy and the value at the same time (**actor-critic algorithm**).
+
+### Actor-critic Algorithm
+
+In actor-critic algorithm, there are two parts:
+
+- **Actor**: takes in the input state and outputs the action probabilities. It learns the optimal policy by updating the model using information provided by the critic.
+- **Critic**: evaluates how good it is to be at the input state by computing the value function. The value guides the actor on how it should adjust.
+
+The two components share parameters of input and hidden layers. THe loss function is a summation of two parts: the negative log likelihood of action measuring the actor, and the mean squared error between the estimated and computed return measuing the critic.
+
+### Advantage Actor-critic (A2C) Algorithm
+
+The critic part computes the advantage value, instead of state-value. It evaluates how better an action is at a state compared to the other actions, reducing variance in policy networks.
+
 ## Reference
 
 Book: *PyTorch 1.x Reinforcement Learning*
